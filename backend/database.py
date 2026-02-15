@@ -36,7 +36,7 @@ class Patient(Base):
     __tablename__ = "patients"
     
     id = Column(String, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, index=True, nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String, nullable=False)
     

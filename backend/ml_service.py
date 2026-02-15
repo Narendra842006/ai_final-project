@@ -4,9 +4,15 @@ Loads pre-trained RandomForest model and provides SHAP explainability
 """
 import pickle
 import numpy as np
-from typing import Dict, Tuple
-import shap
+from typing import Dict, List, Tuple
 from pathlib import Path
+
+# SHAP is optional — graceful fallback if not installed
+try:
+    import shap
+except ImportError:
+    shap = None
+
 from .models import RiskLevel, Department, PatientInput
 
 

@@ -1,10 +1,17 @@
 """
 Pydantic Models for API Request/Response Validation
+Compatible with Pydantic v2
 """
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
+
+# EmailStr requires pydantic[email] / email-validator
+try:
+    from pydantic import EmailStr
+except ImportError:
+    EmailStr = str  # Fallback if email-validator not installed
 
 
 class RiskLevel(str, Enum):
@@ -33,14 +40,19 @@ class VitalSigns(BaseModel):
     temperature: float = Field(..., ge=90, le=110, description="Temperature in Fahrenheit")
     oxygen_saturation: Optional[float] = Field(None, ge=0, le=100, description="SpO2 percentage")
     respiratory_rate: Optional[float] = Field(None, ge=8, le=60, description="Breaths per minute")
-    
-    @validator('bp_systolic', 'bp_diastolic')
-    def validate_bp(cls, v, field):
-        if field.name == 'bp_systolic' and v < 70:
+
+    @field_validator('bp_systolic')
+    @classmethod
+    def validate_systolic(cls, v: float) -> float:
+        if v < 70:
             raise ValueError("Systolic BP critically low")
-        if field.name == 'bp_diastolic' and v > v:
-            raise ValueError("Diastolic BP cannot exceed systolic")
         return v
+
+    @model_validator(mode='after')
+    def validate_bp_relationship(self):
+        if self.bp_diastolic >= self.bp_systolic:
+            raise ValueError("Diastolic BP cannot exceed systolic BP")
+        return self
 
 
 class PatientInput(BaseModel):
@@ -49,7 +61,7 @@ class PatientInput(BaseModel):
     age: int = Field(..., ge=0, le=120, description="Patient age")
     gender: str = Field(..., description="Patient gender")
     vitals: VitalSigns
-    symptoms: List[str] = Field(..., min_items=1, description="List of symptoms")
+    symptoms: List[str] = Field(..., min_length=1, description="List of symptoms")
     medical_history: Optional[List[str]] = Field(default=[], description="Previous conditions")
     allergies: Optional[List[str]] = Field(default=[], description="Known allergies")
     current_medications: Optional[List[str]] = Field(default=[], description="Current medications")

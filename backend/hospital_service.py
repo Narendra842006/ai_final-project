@@ -6,7 +6,13 @@ import os
 import random
 from typing import List, Tuple
 from datetime import datetime
-import googlemaps
+
+# googlemaps is optional — fallback data used if not installed
+try:
+    import googlemaps
+except ImportError:
+    googlemaps = None
+
 from dotenv import load_dotenv
 from .models import HospitalInfo
 from .priority_queue import global_queue
@@ -24,7 +30,10 @@ class HospitalFinderService:
         self.api_key = os.getenv("GOOGLE_MAPS_API_KEY")
         self.gmaps = None
         
-        if self.api_key and self.api_key != "your_google_maps_api_key_here":
+        if googlemaps is None:
+            print("⚠️ googlemaps package not installed")
+            print("📝 Using fallback hospital data")
+        elif self.api_key and self.api_key != "your_google_maps_api_key_here":
             try:
                 self.gmaps = googlemaps.Client(key=self.api_key)
                 print("✅ Google Maps API initialized")

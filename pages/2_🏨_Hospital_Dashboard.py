@@ -7,9 +7,20 @@ import streamlit as st
 import pandas as pd
 import utils
 import config
+from backend.database import init_db, SessionLocal, Patient
+
+init_db()
 
 # Apply custom CSS
 st.markdown(config.HOSPITAL_CSS, unsafe_allow_html=True)
+
+# Hide sidebar
+st.markdown("""
+<style>
+section[data-testid="stSidebar"]{display:none!important}
+[data-testid="collapsedControl"]{display:none!important}
+</style>
+""", unsafe_allow_html=True)
 
 # Get language from session state
 language = st.session_state.get('language', 'English')
@@ -22,6 +33,37 @@ if not st.session_state.get('authenticated', False):
 if st.session_state.get('role') != 'Hospital':
     st.error("This page is only accessible to hospital staff")
     st.stop()
+
+# Load patients from database
+def _load_patients_from_db():
+    db = SessionLocal()
+    try:
+        records = db.query(Patient).order_by(Patient.created_at.desc()).all()
+        patients = []
+        for r in records:
+            symptoms_list = r.symptoms if isinstance(r.symptoms, list) else []
+            vitals_dict = r.vitals if isinstance(r.vitals, dict) else {}
+            patients.append({
+                "ID": len(patients) + 1,
+                "Name": r.email.split("@")[0].title(),
+                "Age": r.age,
+                "Gender": r.gender,
+                "Heart Rate": int(vitals_dict.get("heart_rate", 75)),
+                "BP": f"{int(vitals_dict.get('bp_systolic', 120))}/{int(vitals_dict.get('bp_diastolic', 80))}",
+                "Temp (°F)": round(vitals_dict.get("temperature", 98.6), 1),
+                "Symptoms": ", ".join(symptoms_list[:3]) + ("..." if len(symptoms_list) > 3 else ""),
+                "Risk Score": round(r.priority_score, 1),
+                "Risk Level": r.risk_level,
+                "Immediate": r.priority_score >= 70 and any("chest" in s.lower() for s in symptoms_list),
+                "confidence": r.ai_confidence,
+                "feature_importance": r.feature_importance if isinstance(r.feature_importance, dict) else {},
+                "full_symptoms": symptoms_list,
+            })
+        return patients
+    finally:
+        db.close()
+
+st.session_state.patients = _load_patients_from_db()
 
 # Page header
 st.title(f"🏨 Hospital Dashboard")

@@ -9,8 +9,13 @@ from sqlalchemy.orm import Session
 from typing import List
 import uuid
 from datetime import datetime
-import pdfplumber
 from io import BytesIO
+
+# pdfplumber is optional — PDF endpoint will return error if not installed
+try:
+    import pdfplumber
+except ImportError:
+    pdfplumber = None
 
 from .database import init_db, get_db, Patient, HospitalQueue, AuditLog
 from .models import (
@@ -139,7 +144,7 @@ async def predict_triage(
             email=patient_input.email,
             age=patient_input.age,
             gender=patient_input.gender,
-            vitals=patient_input.vitals.dict(),
+            vitals=patient_input.vitals.model_dump(),
             symptoms=patient_input.symptoms,
             medical_history=patient_input.medical_history,
             allergies=patient_input.allergies,
@@ -319,6 +324,9 @@ async def upload_medical_pdf(
     """
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    
+    if pdfplumber is None:
+        raise HTTPException(status_code=500, detail="pdfplumber package not installed. Install with: pip install pdfplumber")
     
     try:
         # Read PDF
