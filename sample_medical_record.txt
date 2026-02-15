@@ -1,0 +1,55 @@
+PATIENT MEDICAL RECORD
+================================================
+
+Patient Name: John Doe
+Medical Record Number: MRN-2026-001234
+Date of Visit: February 15, 2026
+Department: Emergency Department
+
+VITAL SIGNS
+-----------
+Heart Rate: 145 bpm
+Blood Pressure: 165/95 mmHg
+Temperature: 101.2 F
+Respiratory Rate: 22 breaths/min
+Oxygen Saturation: 94%
+
+CHIEF COMPLAINT
+---------------
+Patient reports severe chest pain and shortness of breath.
+Symptoms started approximately 2 hours ago.
+Pain radiates to left arm.
+
+MEDICAL HISTORY
+---------------
+- Hypertension (diagnosed 2015)
+- Type 2 Diabetes (diagnosed 2018)
+- No known allergies
+
+CURRENT MEDICATIONS
+-------------------
+- Metformin 500mg twice daily
+- Lisinopril 10mg once daily
+
+PHYSICAL EXAMINATION
+--------------------
+Patient appears in moderate distress.
+Diaphoretic and anxious.
+Cardiac: Tachycardic, regular rhythm
+Respiratory: Bilateral breath sounds, mild wheezing
+
+ASSESSMENT
+----------
+Possible acute coronary syndrome
+Requires immediate cardiac evaluation
+
+PLAN
+----
+1. ECG ordered
+2. Cardiac enzymes
+3. Cardiology consult
+4. Continuous monitoring
+
+Physician: Dr. Sarah Johnson, MD
+Emergency Department
+General Hospital

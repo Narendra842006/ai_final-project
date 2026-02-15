@@ -1,0 +1,14 @@
+# Frontend (Streamlit) Dependencies
+
+# Core Framework
+streamlit==1.31.0
+
+# PDF Processing
+PyPDF2==3.0.1
+
+# Data Processing (for utils.py)
+pandas==2.1.4
+numpy==1.26.3
+
+# Utilities
+python-dateutil==2.8.2
